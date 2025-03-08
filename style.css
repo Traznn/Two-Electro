@@ -1,0 +1,207 @@
+:root {
+    --dark-blue: #08316f;
+    --light-blue: #0955a2;
+    --white: #FFFFFF;
+    --gray: #F5F5F5;
+    --yellow-lightning: #FFD700; /* Menambahkan warna kuning petir */
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.biodata-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.biodata-card {
+    text-align: center;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header {
+    background-color: var(--dark-blue);
+    color: var(--white);
+    padding: 1rem 0;
+}
+
+header h1 {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    color: var(--yellow-lightning); /* Mengubah warna judul menjadi kuning petir */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Menambahkan bayangan untuk efek petir */
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+nav ul li a {
+    color: var(--white);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s ease;
+}
+
+nav ul li a:hover {
+    background-color: var(--light-blue);
+}
+
+main {
+    padding: 2rem 0;
+}
+
+section {
+    margin-bottom: 2rem;
+}
+
+h2 {
+    color: var(--dark-blue);
+    border-bottom: 2px solid var(--light-blue);
+    padding-bottom: 0.5rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    border: 1px solid var(--light-blue);
+    padding: 0.5rem;
+    text-align: left;
+}
+
+table th {
+    background-color: var(--light-blue);
+    color: var(--white);
+}
+
+.biodata-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.biodata-card {
+    background-color: var(--gray);
+    padding: 1rem;
+    border-radius: 5px;
+    flex: 1 1 300px;
+}
+
+footer {
+    background-color: var(--dark-blue);
+    color: var(--white);
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav ul li {
+        margin-bottom: 0.5rem;
+    }
+}
+
+.jadwal-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.jadwal-table th,
+.jadwal-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--light-blue);
+}
+
+.jadwal-table th {
+    background-color: var(--dark-blue);
+    color: var(--white);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.jadwal-table tr:nth-child(even) {
+    background-color: var(--gray);
+}
+
+.jadwal-table tr:hover {
+    background-color: #e0e0e0;
+}
+
+.kegiatan-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.kegiatan-list li {
+    background-color: var(--gray);
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.kegiatan-list h3 {
+    color: var(--dark-blue);
+    margin-top: 0;
+}
+
+.foto-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.foto-item {
+    background-color: var(--white);
+    border: 1px solid var(--light-blue);
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.foto-item:hover {
+    transform: translateY(-5px);
+}
+
+.foto-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.foto-item p {
+    padding: 10px;
+    margin: 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--dark-blue);
+}
