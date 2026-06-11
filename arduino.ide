@@ -1,1 +1,218 @@
+#define BLYNK_TEMPLATE_ID "TMPL6aaSSU0Fb"
+#define BLYNK_TEMPLATE_NAME "Kandang Ayam"
+#define BLYNK_AUTH_TOKEN "ozmERNdxf2O41W9I0ZlG3QB3nlAJF8GW"
 
+#define BLYNK_PRINT Serial
+
+#include <WiFi.h>
+#include <BlynkSimpleEsp32.h>
+#include <Wire.h>
+#include "DHTesp.h"
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+// ================= WIFI =================
+char ssid[] = "Redmi";
+char pass[] = "12345678";
+
+// ================= DHT22 =================
+const int DHT_PIN = 15;
+DHTesp dhtSensor;
+
+// ================= LED =================
+const int LED_MERAH = 2;
+
+// ================= RELAY =================
+const int RELAY_FAN = 26;
+
+// ================= OLED =================
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+// ================= TIMER =================
+BlynkTimer timer;
+
+// ================= STATUS =================
+bool kipasNyala = false;
+
+// ==========================================
+// KIRIM DATA SENSOR
+// ==========================================
+void kirimSensor() {
+
+  TempAndHumidity data = dhtSensor.getTempAndHumidity();
+
+  float suhu = data.temperature;
+  float lembab = data.humidity;
+
+  if (isnan(suhu) || isnan(lembab)) {
+    Serial.println("Gagal membaca DHT22");
+    return;
+  }
+
+  // ======================================
+  // LOGIKA KIPAS
+  // ======================================
+  if (suhu >= 30) {
+    kipasNyala = true;
+  } else {
+    kipasNyala = false;
+  }
+
+  // ================= SERIAL =================
+  Serial.print("Suhu : ");
+  Serial.print(suhu);
+  Serial.println(" C");
+
+  Serial.print("Kelembaban : ");
+  Serial.print(lembab);
+  Serial.println(" %");
+
+  Serial.print("Kipas : ");
+  Serial.println(kipasNyala ? "ON" : "OFF");
+
+  Serial.println("----------------------");
+
+  // ================= BLYNK =================
+  Blynk.virtualWrite(V0, suhu);
+  Blynk.virtualWrite(V1, lembab);
+  Blynk.virtualWrite(V2, kipasNyala);
+
+  if (kipasNyala) {
+    Blynk.virtualWrite(V3, "BAHAYA");
+  } else {
+    Blynk.virtualWrite(V3, "AMAN");
+  }
+
+  // ================= LED ESP32 =================
+  digitalWrite(LED_MERAH, kipasNyala);
+
+  // ================= RELAY ACTIVE HIGH =================
+  if (kipasNyala) {
+    digitalWrite(RELAY_FAN, HIGH);   // FAN ON
+  } else {
+    digitalWrite(RELAY_FAN, LOW);    // FAN OFF
+  }
+
+  // ================= OLED =================
+  display.clearDisplay();
+
+  display.drawRect(0, 0, 128, 64, SSD1306_WHITE);
+
+  display.fillRect(0, 0, 128, 12, SSD1306_WHITE);
+
+  display.setTextColor(SSD1306_BLACK);
+  display.setTextSize(1);
+  display.setCursor(18, 2);
+  display.println("KANDANG AYAM");
+
+  display.setTextColor(SSD1306_WHITE);
+
+  // SUHU
+  display.setTextSize(1);
+  display.setCursor(5, 18);
+  display.println("SUHU");
+
+  display.setTextSize(2);
+  display.setCursor(5, 30);
+  display.print(suhu, 1);
+  display.print("C");
+
+  // RH
+  display.setTextSize(1);
+  display.setCursor(75, 18);
+  display.println("RH");
+
+  display.setTextSize(2);
+  display.setCursor(72, 30);
+  display.print(lembab, 0);
+  display.print("%");
+
+  // STATUS
+  display.setTextSize(1);
+  display.setCursor(5, 54);
+
+  if (kipasNyala) {
+    display.print("BAHAYA");
+  } else {
+    display.print("AMAN");
+  }
+
+  // FAN STATUS
+  display.setCursor(75, 54);
+
+  if (kipasNyala) {
+    display.print("FAN ON");
+  } else {
+    display.print("FAN OFF");
+  }
+
+  display.display();
+}
+
+// ==========================================
+// SETUP
+// ==========================================
+void setup() {
+
+  Serial.begin(115200);
+
+  dhtSensor.setup(DHT_PIN, DHTesp::DHT22);
+
+  pinMode(LED_MERAH, OUTPUT);
+
+  // RELAY ACTIVE HIGH
+  pinMode(RELAY_FAN, OUTPUT);
+  digitalWrite(RELAY_FAN, LOW);   // OFF saat awal
+
+  // OLED
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println("OLED gagal");
+    while (true);
+  }
+
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(SSD1306_WHITE);
+
+  display.setCursor(15, 15);
+  display.println("KANDANG");
+
+  display.setCursor(20, 40);
+  display.println("AYAM");
+
+  display.display();
+
+  delay(2000);
+
+  // WiFi
+  Serial.println("Connecting WiFi...");
+  WiFi.begin(ssid, pass);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+  Serial.println("WiFi Connected");
+  Serial.print("IP Address : ");
+  Serial.println(WiFi.localIP());
+
+  // Blynk
+  Blynk.config(BLYNK_AUTH_TOKEN);
+
+  if (Blynk.connect()) {
+    Serial.println("Blynk Connected");
+  } else {
+    Serial.println("Blynk Failed");
+  }
+
+  timer.setInterval(2000L, kirimSensor);
+}
+
+void loop() {
+  Blynk.run();
+  timer.run();
+}
